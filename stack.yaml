@@ -1,5 +1,11 @@
 packages:
 - .
+- location:
+    git: https://github.com/snoyberg/http-client
+    commit: f6397dcc2a7472b34c986ab54ac854cb3fb08fa5
+  dependency: true
+  subdirs:
+  - http-client
 extra-deps:
 - optparse-simple-0.0.3
 - path-0.5.1
