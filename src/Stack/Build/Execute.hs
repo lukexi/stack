@@ -1283,6 +1283,7 @@ printBuildOutput excludeTHLoading makeAbsolute level outH = void $
     $$ CB.lines
     =$ CL.map stripCarriageReturn
     =$ CL.filter (not . isTHLoading)
+    =$ CL.filter (not . isWindowsLinkerSpam)
     =$ CL.mapM toAbsolutePath
     =$ CL.mapM_ (monadLoggerLog $(TH.location >>= liftLoc) "" level)
   where
@@ -1293,6 +1294,13 @@ printBuildOutput excludeTHLoading makeAbsolute level outH = void $
     isTHLoading bs =
         "Loading package " `S8.isPrefixOf` bs &&
         ("done." `S8.isSuffixOf` bs || "done.\r" `S8.isSuffixOf` bs)
+
+    isWindowsLinkerSpam :: S8.ByteString -> Bool
+#ifdef mingw32_HOST_OS
+    isWindowsLinkerSpam bs = "is linked instead of" `S8.isInfixOf` bs
+#else
+    isWindowsLinkerSpam _ = False
+#endif
 
     -- | Convert GHC error lines with file paths to have absolute file paths
     toAbsolutePath bs | not makeAbsolute = return bs
